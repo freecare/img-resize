@@ -3,5 +3,4 @@ node_modules
 *.log
 dist/*.gz
 dist/*.map
-dist/*.js
 .vscode
