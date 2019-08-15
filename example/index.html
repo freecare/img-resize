@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>example</title>
+  </head>
+  <body>
+    <input type="file" id="file-input" />
+    <div>
+      <img src="" alt="" id="img-source" style="max-width: 100%;" />
+      <p>
+        <span>大小: <span id="img-source-text"></span></span>
+        <span>耗时: <span id="img-resize-time"></span></span>
+      </p>
+    </div>
+    <div>
+      <img src="" alt="" id="img-resize" style="max-width: 100%;" />
+      <p>
+        <span>大小: <span id="img-resize-text"></span></span>
+        <button type="button" id="button1">旋转</button>
+      </p>
+    </div>
+
+    <script src="../dist/img-resize.js"></script>
+    <script>
+      const fileInput = document.getElementById('file-input')
+
+      const imgSource = document.getElementById('img-source')
+      const textSource = document.getElementById('img-source-text')
+      const textTime = document.getElementById('img-resize-time')
+
+      const imgResize = document.getElementById('img-resize')
+      const textResize = document.getElementById('img-resize-text')
+
+      let instance = null
+      fileInput.onchange = function(e) {
+        const file = e.target.files[0]
+        if (!file) {
+          return
+        }
+
+        textSource.innerText = file.size
+        setImgSrc(imgSource, file)
+
+        if (file && file.name) {
+          console.log(file)
+          instance = new ImgResize(file, {
+            minWidth: 200,
+            width: 1000
+          })
+          const start = +new Date()
+          instance
+            .resizeToFile()
+            .then(resFile => {
+              console.log(resFile)
+              textResize.innerText = resFile.size
+              setImgSrc(imgResize, resFile)
+            })
+            .catch(err => {
+              console.log(err)
+            })
+            .finally(() => {
+              textTime.innerText = +new Date() - start
+            })
+        }
+      }
+
+      document.getElementById('button1').addEventListener('click', function(e) {
+        if (!instance) {
+          return
+        }
+
+        instance.rotateToFile(false).then(resFile => {
+          textResize.innerText = resFile.size
+          setImgSrc(imgResize, resFile)
+        })
+      })
+
+      function setImgSrc(img, file) {
+        const sourceUrl = URL.createObjectURL(file)
+        img.setAttribute('src', sourceUrl)
+      }
+    </script>
+  </body>
+</html>
